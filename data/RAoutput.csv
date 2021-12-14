@@ -1,0 +1,63 @@
+SELE_{Payment > 80} Play
+ANO, MNO, Payment
+A2, M2, 83
+A2, M3, 88
+A2, M4, 86
+A3, M3, 89
+A4, M3, 85
+A6, M3, 88
+PROJ_{ANO, MNO} Play
+ANO, MNO
+A1, M1
+A1, M2
+A2, M2
+A2, M3
+A2, M4
+A3, M2
+A3, M3
+A4, M2
+A4, M3
+A4, M4
+A5, M1
+A5, M3
+A5, M4
+A6, M2
+A6, M3
+A6, M4
+ACTORS * Play
+ANAME, ANO, MNO, Payment
+L Grassy, A1, M1, 78
+L Grassy, A1, M2, 80
+D Flower, A2, M2, 83
+D Flower, A2, M3, 88
+D Flower, A2, M4, 86
+M Trunk, A3, M2, 74
+M Trunk, A3, M3, 89
+J Swanson, A4, M2, 75
+J Swanson, A4, M3, 85
+J Swanson, A4, M4, 55
+T Branch, A5, M1, 58
+T Branch, A5, M3, 56
+T Branch, A5, M4, 55
+L Leafy, A6, M2, 77
+L Leafy, A6, M3, 88
+L Leafy, A6, M4, 54
+PROJ_{ANO} (ACTORS * Play)
+ANO
+A1
+A2
+A3
+A4
+A5
+A6
+(PROJ_{ANO} (SELE_{Payment > 80} Play)) - (PROJ_{ANO} (SELE_{Payment < 70} Play)) 
+ANO
+A2
+A3
+(PROJ_{ANO} (SELE_{Payment > 80} Play)) U (PROJ_{ANO} (SELE_{Payment < 70} Play))
+ANO
+A2
+A3
+A4
+A6
+A5

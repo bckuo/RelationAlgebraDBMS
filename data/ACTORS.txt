@@ -1,0 +1,7 @@
+ANAME, ANO
+L Grassy, A1
+D Flower, A2
+M Trunk, A3
+J Swanson, A4
+T Branch, A5
+L Leafy, A6

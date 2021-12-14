@@ -1,0 +1,6 @@
+SELE_{Payment > 80} Play
+PROJ_{ANO, MNO} Play
+ACTORS * Play
+PROJ_{ANO} (ACTORS * Play)
+(PROJ_{ANO} (SELE_{Payment > 80} Play)) - (PROJ_{ANO} (SELE_{Payment < 70} Play)) 
+(PROJ_{ANO} (SELE_{Payment > 80} Play)) U (PROJ_{ANO} (SELE_{Payment < 70} Play))
