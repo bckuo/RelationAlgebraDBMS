@@ -3,7 +3,8 @@ package minedbms.operation;
 import minedbms.datatype.Attribute;
 import minedbms.datatype.Relation;
 import minedbms.datatype.Condition;
-import minedbms.operation.GeneralTool.IntArray;
+import static minedbms.operation.GeneralTool.IntArray;
+import static minedbms.operation.GeneralTool.noRepeat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,7 @@ public class RelationOperation {
         for (int i = 0; i < attrs.length; i++) {
             attrsKept[i] = r.getAttrIdx(attrs[i]);
         }
-        if (!GeneralTool.noRepeat(attrs)) {
+        if (!noRepeat(attrs)) {
             throw new IllegalArgumentException("Error: There is a repeat in the giving attributes.");
         }
 
@@ -315,7 +316,7 @@ public class RelationOperation {
     }
 
     // There is no reason both arrays are simplified
-    private static Relation copyData(Relation copiedR, GeneralTool.IntArray pickedAttrs, GeneralTool.IntArray pickedTuples) {
+    private static Relation copyData(Relation copiedR, IntArray pickedAttrs, IntArray pickedTuples) {
         if (pickedAttrs.getType() == IntArray.Types.SIMPLIFIED && pickedTuples.getType() == IntArray.Types.SIMPLIFIED) {
             throw new IllegalArgumentException("Error: Two IntArrays should not be simplified at sametime.");
         }
@@ -336,8 +337,8 @@ public class RelationOperation {
     // order matters. R1 will be the upper, R2 will be the lower
     // the name will simly use r1's name
     private static Relation copyDataVertc(Relation copiedR1, Relation copiedR2,
-            GeneralTool.IntArray pickedAttrs, /* R1 and R2 should have same attributes*/
-            GeneralTool.IntArray pickedTuplesR1, GeneralTool.IntArray pickedTuplesR2) {
+            IntArray pickedAttrs, /* R1 and R2 should have same attributes*/
+            IntArray pickedTuplesR1, IntArray pickedTuplesR2) {
 
         allSameDomain(copiedR1, copiedR2);
         Relation newR = new Relation(copiedR1.name, pickedAttrs.getLength(), pickedTuplesR1.getLength() + pickedTuplesR2.getLength());
@@ -362,8 +363,8 @@ public class RelationOperation {
     // the name will simly use r1's name
     // Two tuple array should be the same length.
     private static Relation copyDataHoriz(Relation copiedR1, Relation copiedR2,
-            GeneralTool.IntArray pickedAttrsR1, GeneralTool.IntArray pickedAttrsR2,
-            GeneralTool.IntArray pickedTuplesR1, GeneralTool.IntArray pickedTuplesR2) {
+            IntArray pickedAttrsR1, IntArray pickedAttrsR2,
+            IntArray pickedTuplesR1, IntArray pickedTuplesR2) {
 
         if (pickedTuplesR1.getLength() != pickedTuplesR2.getLength()) {
             throw new IllegalArgumentException("Error: Two tuple array should be the same length.");
@@ -388,7 +389,7 @@ public class RelationOperation {
     }
 
     private static void copyAttr(Relation newR, Relation copiedR,
-            GeneralTool.IntArray pickedAttrs, int attrOffset) {
+            IntArray pickedAttrs, int attrOffset) {
 
         for (int attrIdx = 0; attrIdx < pickedAttrs.getLength(); attrIdx++) {
             int aIdx = pickedAttrs.getInt(attrIdx);
@@ -397,7 +398,7 @@ public class RelationOperation {
     }
 
     private static void copyTuple(Relation newR, Relation copiedR,
-            GeneralTool.IntArray pickedAttrs, GeneralTool.IntArray pickedTuples, int tupleOffset, int attrOffset) {
+            IntArray pickedAttrs, IntArray pickedTuples, int tupleOffset, int attrOffset) {
         for (int tupleIdx = 0; tupleIdx < pickedTuples.getLength(); tupleIdx++) {
             int tIdx = pickedTuples.getInt(tupleIdx);
             for (int attrIdx = 0; attrIdx < pickedAttrs.getLength(); attrIdx++) {

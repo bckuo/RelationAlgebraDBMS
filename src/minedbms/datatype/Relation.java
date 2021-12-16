@@ -1,6 +1,6 @@
 package minedbms.datatype;
 
-import minedbms.operation.GeneralTool;
+import static minedbms.operation.GeneralTool.removeElement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,7 +103,7 @@ public class Relation {
             }
             // idea from this: https://stackoverflow.com/questions/16839182/
             if (tuplesIdxTable.containsKey(Collections.unmodifiableList(Arrays.asList(this.tuples[i])))){
-                this.tuples = GeneralTool.removeElement(tuples, i);
+                this.tuples = removeElement(tuples, i);
                 this.num_tuples--;
                 repeatCount++;
             } else {
@@ -140,7 +140,7 @@ public class Relation {
             if (tuplesIdxTable.containsKey(Collections.unmodifiableList(Arrays.asList(this.tuples[i])))){
                 this.num_tuples--;
                 i--;
-                this.tuples = GeneralTool.removeElement(tuples, i);
+                this.tuples = removeElement(tuples, i);
             } else {
                 this.tuplesIdxTable.put(Collections.unmodifiableList(Arrays.asList(this.tuples[i])),  i);                
             }

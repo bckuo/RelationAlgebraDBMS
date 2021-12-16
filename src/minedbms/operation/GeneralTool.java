@@ -7,8 +7,6 @@ This class contains several class and function that is for general usage
  */
 public class GeneralTool {
 
-    public static final boolean DEBUG = true;
-
     public abstract static class IntArray {
 
         public abstract int getLength();
@@ -119,28 +117,6 @@ public class GeneralTool {
 
         private Types type;
         private int length;
-    }
-
-    public static <T> void printArray(T[] t) {
-        for (int i = 0; i < t.length; i++) {
-            System.out.print("[" + i + ": " + t[i].toString() + "], ");
-        }
-        System.out.println("");
-    }
-    public static void printArray(int[] t) {
-        for (int i = 0; i < t.length; i++) {
-            System.out.print("[" + i + ": " + t[i] + "], ");
-        }
-        System.out.println("");
-    }
-
-    public static <T> String arrayToString(T[] t) {
-        String s = "";
-        for (int i = 0; i < t.length; i++) {
-            s += "[" + i + ": " + t[i].toString() + "], ";
-        }
-        s += "\n";
-        return s;
     }
 
     public static boolean noRepeat(String[] array) {

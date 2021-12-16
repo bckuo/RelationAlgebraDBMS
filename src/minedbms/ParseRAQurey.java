@@ -8,75 +8,40 @@ import minedbms.datatype.Condition.Inequality;
 import java.io.FileNotFoundException;
 import javafx.util.Pair;
 
+import minedbms.ParseRAQureyConst.InequalitySymbol;
+import minedbms.ParseRAQureyConst.LogicalConjunctionSymbol;
+import minedbms.ParseRAQureyConst.OptCent;
+import minedbms.ParseRAQureyConst.OptLeft;
+
+// they way to import functions: https://stackoverflow.com/questions/50217731
+import static minedbms.ParseRAQureyHelper.cutParenthisis;
+import static minedbms.ParseRAQureyHelper.cutSpaces;
+import static minedbms.ParseRAQureyHelper.findFirstParenAfter;
+import static minedbms.ParseRAQureyHelper.indexOf;
+import static minedbms.ParseRAQureyHelper.isRemain;
+import static minedbms.ParseRAQureyHelper.validParenthesis;
+import static minedbms.ParseRAQureyHelper.findOuterParenPair;
+import static minedbms.ParseRAQureyHelper.findParenPair;
+
 public class ParseRAQurey {
 
-    private static class OptLeft {
-
-        private static final String PROJECT = "PROJ_";
-        private static final String SELECT = "SELE_";
-        private static final String CONDITION_START = "{";
-        private static final String CONDITION_END = "}";
-        private static final String[] ALL = {PROJECT, SELECT};
-
-    }
-
-    private static class OptCent {
-
-        private static final String UNION = "U";
-        private static final String INTERSECT = "INTE";
-        private static final String DIFFERENCE = "-";
-        private static final String CROSS_PRODUCT = "X";
-        private static final String NATURAL_JOIN = "*";
-        // do not change the order of array
-        private static final String[] ALL = {UNION, INTERSECT, DIFFERENCE, CROSS_PRODUCT, NATURAL_JOIN};
-
-        private static final optCentMethod[] METHOD = {
-            RelationOperation::union,
-            RelationOperation::intersect,
-            RelationOperation::difference,
-            RelationOperation::crossProduct,
-            RelationOperation::naturalJoin
-        };
-
-        @FunctionalInterface
-        private interface optCentMethod {
-
-            Relation operate(Relation r1, Relation r2);
-        }
-
-    }
-
-    private static class InequalitySymbol {
-
-        private static final String GREATER_THAN_EQUAL_TO = ">=";
-        private static final String LESS_THAN_EQUAL_TO = "<=";
-        private static final String GREATER_THAN = ">";
-        private static final String EQUAL_TO = "=";
-        private static final String LESS_TAHN = "<";
-        // LESS_THAN_EQUAL_TO, GREATER_THAN_EQUAL_TO should be preceeding for test before the other
-        // do not change the order of array
-        private static final String[] ALL = {GREATER_THAN_EQUAL_TO, LESS_THAN_EQUAL_TO, GREATER_THAN, EQUAL_TO, LESS_TAHN};
-    }
-
-    private static class LogicalConjunctionSymbol {
-
-        private static final String AND = ", ";
-        private static final String OR = "OR";
-        // LESS_THAN_EQUAL_TO, GREATER_THAN_EQUAL_TO should be preceeding for test before the other
-        private static final String[] ALL = {AND, OR};
-    }
-
-    private static final char[] PARENTHISIS = {'(', ')'};
-    private static final char PARENTHISIS_REPLACED = '|';
     private MineDBMS dbms;
-
+    
     public ParseRAQurey(MineDBMS dbms) {
         this.dbms = dbms;
     }
 
+    /*
+    0. remove redundant paranthesis
+    1. check if query start with '('
+        True: The query is '( subQ ) centOpt R2', R2 might be another query
+            
+        False:  
+    */
     public Relation parse(String query) throws FileNotFoundException {
+        Relation parse_result = null;
         if (query == null || !validParenthesis(query)) {
-            return null;
+            return parse_result;
         }
         // get rid off redundant parenthesises and space
         // to make query from "   (    ( PROJ_{ANO} (SELE_{Payment > 50} Play)   )   )    " to "PROJ_{ANO} (SELE_{Payment > 50} Play)", so if there is Parenthesis at first char, it must no be a redundant one
@@ -84,27 +49,17 @@ public class ParseRAQurey {
 
         if (query.charAt(0) == '(') {  // imply there is a relation at begining of query
             //index of corresponding right parenthesis of first char, which is left parenthesis by passing "query.charAt(0) == '('", of $query
-            int rightParentIdx = findPair(query, 0);
-            Relation leftR = parse(query.substring(0, rightParentIdx + 1));
-            if (isRemain(query.substring(rightParentIdx + 1))) { // if there are string remaining after $rightParentIdx
-                int firstParenAfter = findFirstParenAfter(query, rightParentIdx); // find first '(' in $query after $rightParentIdx
-                int endOfSearch;
-                if (firstParenAfter == -1) {
-                    endOfSearch = query.length();
-                } else {
-                    endOfSearch = firstParenAfter;
-                }
-                //find optCent in the $query after $rightParentIdx but before $firstParenAfter, and return the type of it, starting index and ending index of it
-                // e.g. {1, 29, 30} means the oprCent found is "X" and it is started at 29 and ended at index 30
-                // if not found all value will be -1
-                int[] optCentFound = findOptCent(query, rightParentIdx, endOfSearch);
-                int optCentEndIdx = optCentFound[2];
-                if (optCentEndIdx == -1) { // which mean not found optCent, should throw exception since there should be either noting after $rightParentIdx or a oprCent and relation after oprCent
-                    throw new IllegalArgumentException();
-                } else {
-                    Relation rightR = parse(query.substring(optCentEndIdx));
-                    return callOptCent(optCentFound[0], leftR, rightR);
-                }
+            int rightParentIdx = findParenPair(query, 0);
+            int firstParenAfter = findFirstParenAfter(query, rightParentIdx); // find first '(' in $query after $rightParentIdx
+            int endOfSearch = firstParenAfter==-1 ? query.length():firstParenAfter;            
+            int[] optCentFound = findOptCent(query, rightParentIdx, endOfSearch);
+            int optCentEndIdx = optCentFound[2];
+            if (optCentEndIdx == -1) { // which mean not found optCent, should throw exception since there should be either noting after $rightParentIdx or a oprCent and relation after oprCent
+                throw new IllegalArgumentException();
+            } else {
+                Relation leftR = parse(query.substring(0, rightParentIdx + 1));
+                Relation rightR = parse(query.substring(optCentEndIdx));
+                return callOptCent(optCentFound[0], leftR, rightR);
             }
         } else { // the first char is not '(', that means the query is either started with a name of a relation file or optLeft
             int firstParenAfter = findFirstParenAfter(query, 0); // find first '(' in $query after $rightParentIdx
@@ -140,7 +95,6 @@ public class ParseRAQurey {
                 }
             }
         }
-        return null;
     }
 
     private Relation projectParse(String condition, Relation r) {
@@ -181,16 +135,16 @@ public class ParseRAQurey {
         return RelationOperation.select(r, cond);
     }
 
-    private Relation callOptCent(int optCentType, Relation leftR, Relation rightR) {
-        //{UNION, INTERSECT, DIFFERENCE, CROSS_PRODUCT, NATURAL_JOIN};
-        return OptCent.METHOD[optCentType].operate(leftR, rightR);
-    }
-
     /*
+    find optCent in the $query after $start but before $end
+    
     Return:
     type
     start index of the optCent
     end index of the optCent (the index right after last char of opeCent)
+    
+    e.g. {1, 29, 30} means the oprCent found is "X" and it is started at 29 and ended at index 30
+    if not found all value will be -1
      */
     private int[] findOptCent(String query, int start, int end) {
         for (int optCentType = 0; optCentType < OptCent.ALL.length; optCentType++) {
@@ -198,8 +152,8 @@ public class ParseRAQurey {
                 int lastChar = qCharIdx + OptCent.ALL[optCentType].length() - 1;
                 if (lastChar < end && lastChar < query.length()) { // to check if the lastChar of tested char is out of bounds.
                     boolean foundOptCent = true;
-                    for (int opeCentIdx = 0; opeCentIdx < OptCent.ALL[optCentType].length(); opeCentIdx++) {
-                        if (query.charAt(opeCentIdx + qCharIdx) != OptCent.ALL[optCentType].charAt(opeCentIdx)) {
+                    for (int optCentIdx = 0; optCentIdx < OptCent.ALL[optCentType].length(); optCentIdx++) {
+                        if (query.charAt(optCentIdx + qCharIdx) != OptCent.ALL[optCentType].charAt(optCentIdx)) {
                             foundOptCent = false;
                             break;
                         }
@@ -213,6 +167,11 @@ public class ParseRAQurey {
         return new int[]{-1, -1, -1};
     }
 
+    private Relation callOptCent(int optCentType, Relation leftR, Relation rightR) {
+        //{UNION, INTERSECT, DIFFERENCE, CROSS_PRODUCT, NATURAL_JOIN};
+        return OptCent.METHOD[optCentType].operate(leftR, rightR);
+    }
+    
     /*
     Return:
     type
@@ -261,132 +220,5 @@ public class ParseRAQurey {
             }
         }
         return new int[]{-1, -1, -1};
-    }
-
-    private boolean isRemain(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) != ' ') {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int findFirstParenAfter(String str, int start) {
-        for (int i = start; i < str.length(); i++) {
-            if (str.charAt(i) == '(') {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public static String cutSpaces(String str) {
-        int start = -1, end = -1;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) != ' ') {
-                start = i;
-                break;
-            }
-        }
-        for (int i = str.length() - 1; i > start; i--) {
-            if (str.charAt(i) != ' ') {
-                end = i + 1;
-                break;
-            }
-        }
-        return str.substring(start, end);
-    }
-
-    private static String cutParenthisis(String str) {
-        String cut = cutSpaces(str);
-        int[] index = findParenthesisPair(cut, 0);
-        while (index[0] == 0 && index[1] == cut.length() - 1) {
-            cut = cutSpaces(cut.substring(index[0] + 1, index[1]));
-            index = findParenthesisPair(cut, 0);
-        }
-        return cut;
-    }
-
-    /*
-    return: 
-    First int: the index of the "matched string" in target
-    Second int: the index of the "matched string" in str
-     */
-    private static Pair<Integer, Integer> indexOf(String str, String[] target) {
-        for (int i = 0; i < target.length; i++) {
-            int idx = str.indexOf(target[i]);
-            if (idx != -1) {
-                return new Pair<Integer, Integer>(i, idx);
-            }
-        }
-        return new Pair<Integer, Integer>(-1, null);
-    }
-
-    // From the start of str, found a paired parenthesis and return the index of them.
-    // If 
-    // 1. there is no parenthesis, 
-    // 2. no matched right parenthesis for the first left parenthesis, 
-    // return [-1, -1]
-    private static int[] findParenthesisPair(String str, int startIdx) {
-        int[] parenthesisIdx = {-1, -1};
-        if (startIdx >= str.length()) {
-            return parenthesisIdx;
-        }
-        boolean foundLeft = false;
-        int count = 0;
-        for (int i = startIdx; i < str.length(); i++) {
-            if (str.charAt(i) == PARENTHISIS[0]) {
-                if (!foundLeft) {
-                    foundLeft = true;
-                    parenthesisIdx[0] = i;
-                } else {
-                    count++;
-                }
-            } else if (str.charAt(i) == PARENTHISIS[1]) {
-                if (foundLeft && count == 0) {
-                    parenthesisIdx[1] = i;
-                    break;
-                }
-                count--;
-            }
-        }
-        if (parenthesisIdx[1] == -1) {
-            parenthesisIdx[0] = -1;
-        }
-        return parenthesisIdx;
-    }
-
-    private static int findPair(String str, int leftParenIdx) {
-        if (leftParenIdx >= str.length() - 1 || str.charAt(leftParenIdx) != '(') {
-            return -1;
-        }
-        int count = 0;
-        for (int i = leftParenIdx + 1; i < str.length(); i++) {
-            if (str.charAt(i) == PARENTHISIS[0]) {
-                count++;
-            } else if (str.charAt(i) == PARENTHISIS[1]) {
-                if (count == 0) {
-                    return i;
-                }
-                count--;
-            }
-        }
-        return -1;
-    }
-
-    private static boolean validParenthesis(String str) {
-        int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == PARENTHISIS[0]) {
-                count++;
-            } else if (str.charAt(i) == PARENTHISIS[1]) {
-                count--;
-            }
-            if (count < 0) {
-                return false;
-            }
-        }
-        return count == 0;
     }
 }

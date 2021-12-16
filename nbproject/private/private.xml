@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/ParseRAQurey.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/datatype/Relation.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/datatype/Attribute.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/operation/GeneralTool.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/datatype/Domain.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/MineDBMS.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/datatype/Condition.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/ParseRAQureyConst.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/operation/RelationOperation.java</file>
+            <file>file:/D:/My%20Projects/Java/Projects/RelationAlgebraDBMS/src/minedbms/ParseRAQureyHelper.java</file>
+        </group>
+    </open-files>
+</project-private>
