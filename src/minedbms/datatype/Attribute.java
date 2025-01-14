@@ -1,6 +1,6 @@
 package minedbms.datatype;
 
-public class Attribute<T extends Number & Comparable<T>> {
+public class Attribute {
 
     public String name;
     private Domain domain;
@@ -68,7 +68,7 @@ public class Attribute<T extends Number & Comparable<T>> {
         if (obj == null) {
             return false;
         }
-        if (obj.getClass() != this.getClass()) {
+        if (obj instanceof Attribute == false) {
             return false;
         }        
         final Attribute other = (Attribute) obj;

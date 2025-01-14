@@ -198,11 +198,11 @@ public class RelationOperation {
         }
 
         // classify the r2 tuple by the shared attribute
-        HashMap<List<String>, ArrayList<Integer>> r2Classification = new HashMap();
+        HashMap<List<String>, ArrayList<Integer>> r2Classification = new HashMap<>();
         for (int i = 0; i < r2.getNum_tuple(); i++) {
             String[] key = getKey(r2, attrsMatchR2, i);
             if (!r2Classification.containsKey(Collections.unmodifiableList(Arrays.asList(key)))) {
-                r2Classification.put(Collections.unmodifiableList(Arrays.asList(key)), new ArrayList());
+                r2Classification.put(Collections.unmodifiableList(Arrays.asList(key)), new ArrayList<>());
             }
             r2Classification.get(Collections.unmodifiableList(Arrays.asList(key))).add(i);
         }

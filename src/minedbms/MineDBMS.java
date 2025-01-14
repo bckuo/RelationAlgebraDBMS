@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Scanner;
 
-
 /*
 It's not allowed to have following symbols or pattern in the name of relation or attribute:
 symbols: '<', '=', '>', '{', '}', '(', ')' 
@@ -32,8 +31,8 @@ The next implemetations should be
 public class MineDBMS {
 
     private String defaultPath = "data/";
-    private HashMap<String, Relation> relations = new HashMap();
-    private HashMap<String, Relation> queries = new HashMap();
+    private HashMap<String, Relation> relations = new HashMap<String, Relation>();
+    private HashMap<String, Relation> queries = new HashMap<String, Relation>();
     private ParseRAQurey parseQ = new ParseRAQurey(this);
 
     public MineDBMS(String defaultPath) {
@@ -47,7 +46,8 @@ public class MineDBMS {
     }
 
     // this is for project
-    public static void parse(MineDBMS dbms, String query, String outputPath, boolean append) throws FileNotFoundException, IOException {
+    public static void parse(MineDBMS dbms, String query, String outputPath, boolean append)
+            throws FileNotFoundException, IOException {
         System.out.println(query);
         Relation r = dbms.parse(query);
         System.out.println(r);
@@ -131,11 +131,13 @@ public class MineDBMS {
                 this.queries.put(line, r);
             }
         }
+        input.close();
     }
 
     // this is for project
-    // normaly please use another readQueries, and retrieve data from getQuery 
-    public static void readQueries(MineDBMS dbms, String inputPath, String outputPath) throws FileNotFoundException, IOException {
+    // normaly please use another readQueries, and retrieve data from getQuery
+    public static void readQueries(MineDBMS dbms, String inputPath, String outputPath)
+            throws FileNotFoundException, IOException {
         String name = getName(inputPath);
         if (name == null) {
             return;
@@ -157,6 +159,7 @@ public class MineDBMS {
                 parse(dbms, line, outputPath, true);
             }
         }
+        input.close();
     }
 
     public static Relation readTable(String filePath) throws FileNotFoundException {
@@ -170,6 +173,7 @@ public class MineDBMS {
         while (input.hasNextLine()) {
             inputString += input.nextLine() + "\n";
         }
+        input.close();
 
         final String delimiter = ", ";
         String[] data = inputString.split("\n");
@@ -204,14 +208,15 @@ public class MineDBMS {
             }
         }
 
-        if (slashIdx == -1 || dotIdx == -1 || slashIdx >= dotIdx || filePath.substring(dotIdx + 1).compareTo(FILE_FORMAT) != 0) {
+        if (slashIdx == -1 || dotIdx == -1 || slashIdx >= dotIdx
+                || filePath.substring(dotIdx + 1).compareTo(FILE_FORMAT) != 0) {
             return null;
         }
 
         return filePath.substring(slashIdx + 1, dotIdx);
     }
 
-    //https://www.baeldung.com/java-write-to-file
+    // https://www.baeldung.com/java-write-to-file
     public static void writeTable(Relation r, String preceeding, String filename, boolean append) throws IOException {
         if (filename == null) {
             filename = r.name;

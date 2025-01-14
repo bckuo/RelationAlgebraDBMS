@@ -1,7 +1,6 @@
 package minedbms;
 
 import minedbms.operation.RelationOperation;
-import minedbms.MineDBMS;
 import minedbms.datatype.Relation;
 import minedbms.datatype.Condition;
 import minedbms.datatype.Condition.Inequality;
@@ -9,7 +8,7 @@ import java.io.FileNotFoundException;
 import javafx.util.Pair;
 
 import minedbms.ParseRAQureyConst.InequalitySymbol;
-import minedbms.ParseRAQureyConst.LogicalConjunctionSymbol;
+// import minedbms.ParseRAQureyConst.LogicalConjunctionSymbol;
 import minedbms.ParseRAQureyConst.OptCent;
 import minedbms.ParseRAQureyConst.OptLeft;
 
@@ -18,9 +17,9 @@ import static minedbms.ParseRAQureyHelper.cutParenthisis;
 import static minedbms.ParseRAQureyHelper.cutSpaces;
 import static minedbms.ParseRAQureyHelper.findFirstParenAfter;
 import static minedbms.ParseRAQureyHelper.indexOf;
-import static minedbms.ParseRAQureyHelper.isRemain;
+// import static minedbms.ParseRAQureyHelper.isRemain;
 import static minedbms.ParseRAQureyHelper.validParenthesis;
-import static minedbms.ParseRAQureyHelper.findOuterParenPair;
+// import static minedbms.ParseRAQureyHelper.findOuterParenPair;
 import static minedbms.ParseRAQureyHelper.findParenPair;
 
 public class ParseRAQurey {

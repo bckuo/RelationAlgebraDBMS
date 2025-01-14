@@ -120,7 +120,7 @@ public class GeneralTool {
     }
 
     public static boolean noRepeat(String[] array) {
-        HashMap<String, Boolean> hm = new HashMap();
+        HashMap<String, Boolean> hm = new HashMap<>();
         for (int i = 0; i < array.length; i++) {
             if (hm.containsKey(array[i])) {
                 return false;
